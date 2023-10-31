@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>🟢 Work Project</title>
+		<style>
+			body { margin: 0; }
+		</style>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+		
+	</head>
+	<body>
+		
+		<script type="module" src="./src/js/project.js"></script>
+		<script type="v-vertext/v-fragment" id="planeVertexshader">
+			varying vec2 vUv;
+
+			void main(){
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			}
+		</script>
+		<script type="v-vertext/v-fragment" id="planeFragmentshader">
+			uniform vec2 u_resolution;
+			uniform vec2 u_mouse;
+			uniform vec2 u_mouse_ray;
+			uniform float u_time;
+			uniform float u_cir_inner;
+			uniform float u_cir_outer;
+
+			varying vec2 vUv;
+
+			#define PI 3.14159265358979323846;
+
+			mat2 rotate2d(float _angle){
+				return mat2(cos(_angle),-sin(_angle),
+							sin(_angle),cos(_angle));
+			}
+
+			void main(){
+				vec2 uv = vUv;
+				vec2 st = gl_FragCoord.xy / u_resolution.xy;
+				vec2 mouseMap = vUv.xy / u_mouse_ray.xy;
+
+				
+				//1) gradient x axis
+				//gl_FragColor = vec4( vec3( vUv.x ) , 1.0);
+
+				//2) reverse gradient x axis 
+				//gl_FragColor = vec4( vec3(mouseMap, 0.0) , 1.0);
+
+				//3)Distance 1 (create circle like shape)
+				//float dist = distance(uv, u_mouse);
+				//gl_FragColor = vec4( vec3(dist) , 1.0);
+
+				//4)Distance 2 (create circle like shape)
+				//float dist = length(uv - u_mouse);
+				//gl_FragColor = vec4( vec3(dist) , 1.0);
+
+				//5)create circle like shape with dynamic changes value
+				//for inverse circle minus length value from 1.0
+				//for hard ages use step and smoothstep function
+				//to change circle size multiply length value
+
+				//option 1> 
+				//float dist = 1.0 - length(uv - 0.5);
+				//option 2> 
+				//float dist = 1.0 - distance(uv - 0.5, vec2(0.0));
+				
+				//float dist1 = pow(dist,  2.0 * abs(sin(u_time)));
+				//gl_FragColor = vec4( vec3(dist1) , 1.0);
+
+				//5)create donut like shape
+				//float dist = step(u_cir_outer, distance(uv - 0.5, vec2(0.0)));
+				//float dist1 = step(u_cir_inner, 1.0 - distance(uv - 0.5, vec2(0.0)));
+				//gl_FragColor = vec4( vec3(dist1 + dist) , 1.0);
+
+				//6) create stripes
+				//fract returns floting value
+				
+				//multiplication with fract input value creates stripe effect
+				//float stripe = fract(uv.x * 10.0) + fract(uv.y * 10.0) ;
+				//gl_FragColor = vec4( vec3(stripe) , 1.0);
+
+				//7) create circular stripes
+				//add or remove u_time value in fract input multiplication value (10.0 - u_time) creates ripple aniamtion 
+				// divide distance value form final fract value create radar ripple like effect => fract(dist * 10.0 - u_time) / dist
+				// the fract value divided by distance value, again divide by any value dark faded value => fract(dist * 10.0 - u_time) / dist / 40.0
+
+				//float dist = distance(uv - 0.5, vec2(0.0));
+				//float fract = fract(dist * 10.0 - u_time);
+				//float fract = fract(dist * 10.0 - u_time) / dist / 40.0;
+				//gl_FragColor = vec4( vec3(fract ) , 1.0);
+
+				//8) add color in effect with mouse ray
+				vec3 final_color = vec3(0.0,0.0,0.5);				
+
+				float dist = distance(uv - 0.5, u_mouse_ray);
+				float fract = fract(dist * 10.0 - u_time) / dist / 40.0;
+				gl_FragColor = vec4( vec3(fract) + final_color , 1.0);
+
+				//9) chess board pattern
+				//float size = 10.0;
+				
+				//float stripes = floor(uv.x * size ) + floor(uv.y * size );
+				//stripes = mod(stripes, 2.0);
+				
+				//gl_FragColor = vec4(vec3(stripes),1.0);
+
+
+				//10) dots pattern
+				//float size = 5.0;
+				//float stripes = smoothstep( u_cir_inner, u_cir_outer, length(fract(uv * size)-0.5));
+				//gl_FragColor = vec4(vec3(stripes ),1.0);
+
+				//11) rings
+				//float size = 5.0;
+				//float stripes = smoothstep( u_cir_inner, u_cir_outer, length(fract(uv * size)-0.5));
+				//float stripes1 = smoothstep( u_cir_inner+0.1, u_cir_outer+0.1, length(fract(uv * size)-0.5));
+				//gl_FragColor = vec4(vec3(stripes - stripes1),1.0);
+
+
+				//12) chessboard tilted
+				//uv -= 0.5;
+				//uv *= rotate2d(u_time * 0.25);
+				//uv += 0.5;
+
+
+				//float box_count = 10.0;
+				//float stripe = floor(uv.x * box_count) + floor(uv.y * box_count);
+				//stripe = mod(stripe, 2.0);
+			
+				//gl_FragColor = vec4(vec3(stripe),1.0);
+
+			}
+		</script>
+	
+	</body>
+</html>

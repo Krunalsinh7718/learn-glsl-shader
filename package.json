@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "cannon-es": "^0.20.0",
+    "dat.gui": "^0.7.9",
+    "gsap": "^3.12.2",
+    "save-dev": "^0.0.1-security",
+    "three": "^0.156.1",
+    "vite": "^4.4.9"
+  }
+}
